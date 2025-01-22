@@ -19,6 +19,11 @@ class ZebraRfidSdkPlugin {
     return _channel.invokeMethod('toast', {"text": text});
   }
 
+  // set power
+  static Future<dynamic> setPower(int power) async {
+    return _channel.invokeMethod('setPower', {"power": power});
+  }
+
   ///
   static Future<dynamic> onRead() async {
     return _channel.invokeMethod('startRead');

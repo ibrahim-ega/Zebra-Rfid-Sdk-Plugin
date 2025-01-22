@@ -332,6 +332,26 @@ public class RFIDHandler implements Readers.RFIDReaderEventHandler {
         }
     }
 
+    public synchronized void setAntennaPower(int new_power) {
+    try {
+      // get the configuration
+      Antennas.AntennaRfConfig config = reader.Config.Antennas.getAntennaRfConfig(1);
+      this.MAX_POWER = new_power;
+      config.setTransmitPowerIndex(this.MAX_POWER);
+      config.setrfModeTableIndex(0);
+      config.setTari(0);
+      reader.Config.Antennas.setAntennaRfConfig(1, config);
+    } catch (InvalidUsageException e) {
+      e.printStackTrace();
+    } catch (OperationFailureException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public synchronized void setMaxPower(int new_power) {
+    this.MAX_POWER = new_power;
+  }
+
 
     @Override
     public void RFIDReaderAppeared(ReaderDevice readerDevice) {
