@@ -352,6 +352,60 @@ public class RFIDHandler implements Readers.RFIDReaderEventHandler {
     this.MAX_POWER = new_power;
   }
 
+   public void writeTag(String sourceEPC, String Password, String targetData, int offset, String type) {
+    Log.d(TAG, "WriteTag " + targetData);
+    try {
+      MEMORY_BANK memory_bank = MEMORY_BANK.MEMORY_BANK_EPC;
+      if (type == "EPC") {
+         memory_bank = MEMORY_BANK.MEMORY_BANK_EPC;
+      } else if (type == "USER") {
+         memory_bank = MEMORY_BANK.MEMORY_BANK_USER;
+      } else if(type == "PASSWORD") {
+         memory_bank = MEMORY_BANK.MEMORY_BANK_RESERVED;
+      } else {
+         memory_bank = MEMORY_BANK.MEMORY_BANK_EPC;
+      }
+      TagData tagData = null;
+      String tagId = sourceEPC;
+      TagAccess tagAccess = new TagAccess();
+      TagAccess.WriteAccessParams writeAccessParams = tagAccess.new WriteAccessParams();
+      String writeData = targetData; //write data in string
+      writeAccessParams.setAccessPassword(Long.parseLong(Password, 16));
+      writeAccessParams.setMemoryBank(memory_bank);
+      writeAccessParams.setOffset(offset); // start writing from word offset 0
+      writeAccessParams.setWriteData(writeData);
+      // set retries in case of partial write happens
+      writeAccessParams.setWriteRetries(3);
+      // data length in words
+      writeAccessParams.setWriteDataLength(writeData.length() / 4);
+      // 5th parameter bPrefilter flag is true which means API will apply pre filter internally
+      // 6th parameter should be true in case of changing EPC ID it self i.e. source and target both is EPC
+      boolean useTIDfilter = memory_bank == MEMORY_BANK.MEMORY_BANK_EPC;
+      reader.Actions.TagAccess.writeWait(tagId, writeAccessParams, null, tagData, true, useTIDfilter);
+    } catch (InvalidUsageException e) {
+      e.printStackTrace();
+    } catch (OperationFailureException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void lockTag(String sourceEPC) {
+    try {
+      TagAccess tagAccess = new TagAccess();
+      TagAccess.LockAccessParams lockAccessParams = tagAccess.new
+      LockAccessParams();
+      /* lock now */
+      lockAccessParams.setLockPrivilege(LOCK_DATA_FIELD.LOCK_EPC_MEMORY,
+      LOCK_PRIVILEGE.LOCK_PRIVILEGE_PERMA_LOCK);
+      lockAccessParams.setAccessPassword(0);
+      reader.Actions.TagAccess.lockWait(sourceEPC, lockAccessParams, null);
+    } catch (InvalidUsageException e) {
+        e.printStackTrace();
+    } catch (OperationFailureException e) {
+        e.printStackTrace();
+    }
+  }
+
 
     @Override
     public void RFIDReaderAppeared(ReaderDevice readerDevice) {

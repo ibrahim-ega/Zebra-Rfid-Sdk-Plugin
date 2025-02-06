@@ -67,7 +67,15 @@ public class ZebraRfidSdkPlugin implements FlutterPlugin, MethodCallHandler, Str
         result.success(null);
         break;
       case "write":
-
+        String sourceEPC = call.argument("sourceEPC");
+        String rfidPassword = call.argument("rfidPassword");
+        String targetEPC = call.argument("targetEPC");
+        String type = call.argument("type");
+        rfidHandler.writeTag(sourceEPC, rfidPassword, targetEPC, 2, type);
+        break;
+      case "lock":
+        String sourceEPC = call.argument("sourceEPC");
+        rfidHandler.lockTag(sourceEPC);
         break;
       case "setPower":
         int power = call.argument("power");

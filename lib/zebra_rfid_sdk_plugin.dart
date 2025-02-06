@@ -29,9 +29,28 @@ class ZebraRfidSdkPlugin {
     return _channel.invokeMethod('startRead');
   }
 
-  ///写
-  static Future<dynamic> write() async {
-    return _channel.invokeMethod('write');
+  ///
+  static Future<dynamic> write(
+    String sourceEPC,
+    String rfidPassword,
+    String targetEPC,
+    String type,
+  ) async {
+    return _channel.invokeMethod('write', {
+      "sourceEPC": sourceEPC,
+      "rfidPassword": rfidPassword,
+      "targetEPC": targetEPC,
+      "type": type,
+    });
+  }
+
+  ///
+  static Future<dynamic> lockTag(
+    String sourceEPC,
+  ) async {
+    return _channel.invokeMethod('lock', {
+      "sourceEPC": sourceEPC,
+    });
   }
 
   ///connect device
